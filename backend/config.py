@@ -33,7 +33,7 @@ class Config:
     SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
     
     # CORS configuration - restrict to specific frontend domain in production
-    FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+    FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://backoffice-1-28ne.onrender.com')
     
     # Rate limiting configuration
     RATELIMIT_STORAGE_URL = os.environ.get('RATELIMIT_STORAGE_URL', 'memory://')
