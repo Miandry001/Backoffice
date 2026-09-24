@@ -62,9 +62,14 @@ limiter = Limiter(
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# Redirect to login page when user needs to authenticate
-login_manager.login_view = 'auth.login'
-login_manager.login_message = 'Please log in to access this page.'
+# Retourne une erreur JSON 401 au lieu d'une redirection 404 pour l'API React
+@login_manager.unauthorized_handler
+def unauthorized():
+    return jsonify({
+        'status': 'unauthorized',
+        'message': 'Please log in to access this resource.'
+    }), 401
+
 
 # User loader callback - Flask-Login uses this to reload the user object
 # from the user ID stored in the session
