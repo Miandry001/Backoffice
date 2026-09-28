@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { LogIn } from 'lucide-react'
+import { apiFetch } from '../api'
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('')
@@ -13,10 +14,9 @@ export default function Login({ onLogin }) {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await apiFetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ username, password })
       })
 

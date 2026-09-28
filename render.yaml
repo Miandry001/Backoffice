@@ -1,0 +1,30 @@
+services:
+  # Flask Backend Service
+  - type: web
+    name: backoffice-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: postgresql://backoffice_db_xftg_user:TuOAkns1EapWeTIdk6C37S9UcujUN4pQ@dpg-daqe8nbncjis739ljj3g-a/backoffice_db_xftg
+      - key: FRONTEND_URL
+        value: https://backoffice-1-28ne.onrender.com
+      - key: SESSION_COOKIE_SECURE
+        value: "True"
+      - key: SESSION_COOKIE_HTTPONLY
+        value: "True"
+      - key: SESSION_COOKIE_SAMESITE
+        value: "Lax"
+
+  # React Frontend Service
+  - type: web
+    name: backoffice-frontend
+    env: node
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && serve -s dist -l $PORT
+    envVars:
+      - key: VITE_API_URL
+        value: https://backoffice-d1q6.onrender.com

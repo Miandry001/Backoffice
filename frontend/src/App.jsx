@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard'
 import AdminPanel from './components/AdminPanel'
 import DataEntry from './components/DataEntry'
 import Navbar from './components/Navbar'
+import { apiFetch } from './api'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -13,9 +14,7 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/auth/me', {
-          credentials: 'include'
-        })
+        const response = await apiFetch('/api/auth/me')
         if (response.ok) {
           const userData = await response.json()
           setUser(userData)
@@ -31,7 +30,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+      await apiFetch('/api/auth/logout', { method: 'POST' })
       setUser(null)
     } catch (error) {
       console.error('Logout failed:', error)

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, FileSpreadsheet, Plus, Users, Settings } from 'lucide-react'
+import { apiFetch } from '../api'
 
 export default function Dashboard({ user }) {
   const [sheets, setSheets] = useState([])
@@ -11,7 +12,7 @@ export default function Dashboard({ user }) {
 
   const fetchSheets = async () => {
     try {
-      const response = await fetch('/api/sheets/list', { credentials: 'include' })
+      const response = await apiFetch('/api/sheets/list')
       if (response.ok) {
         const data = await response.json()
         setSheets(data)

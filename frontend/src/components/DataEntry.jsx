@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Save, ChevronLeft, ChevronRight, RefreshCw, FileSpreadsheet } from 'lucide-react'
+import { apiFetch } from '../api'
 
 export default function DataEntry({ user }) {
   const location = useLocation()
@@ -21,7 +22,7 @@ export default function DataEntry({ user }) {
 
   const fetchSections = async () => {
     try {
-      const response = await fetch('/api/data/sections', { credentials: 'include' })
+      const response = await apiFetch('/api/data/sections')
       if (response.ok) {
         const data = await response.json()
         if (data.length === 0) {
@@ -47,9 +48,7 @@ export default function DataEntry({ user }) {
   const fetchSheetData = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/sheets/${sheetId}/data?sheet_title=Sheet1`, {
-        credentials: 'include'
-      })
+      const response = await apiFetch(`/api/sheets/${sheetId}/data?sheet_title=Sheet1`)
       if (response.ok) {
         const data = await response.json()
         if (data.data && data.data.length > 0) {
@@ -68,10 +67,9 @@ export default function DataEntry({ user }) {
     e.preventDefault()
     setLoading(true)
     try {
-      const response = await fetch('/api/sheets/connect', {
+      const response = await apiFetch('/api/sheets/connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ sheet_url: sheetUrl, sheet_name: 'Main Data Sheet' })
       })
       if (response.ok) {
@@ -100,10 +98,9 @@ export default function DataEntry({ user }) {
     setSaving(true)
     try {
       const values = headers.map((_, index) => formData[index] || '')
-      const response = await fetch(`/api/sheets/${sheetId}/append?sheet_title=Sheet1`, {
+      const response = await apiFetch(`/api/sheets/${sheetId}/append?sheet_title=Sheet1`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ values })
       })
       if (response.ok) {

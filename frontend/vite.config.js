@@ -11,5 +11,7 @@ export default defineConfig({
         changeOrigin: true
       }
     }
-  }
+  },
+  // In production, the VITE_API_URL environment variable should be set to the Flask backend URL
+  // The proxy is only used in development
 })

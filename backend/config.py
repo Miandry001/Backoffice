@@ -20,7 +20,8 @@ class Config:
     SECRET_KEY = os.environ.get('FLASK_SECRET_KEY') or 'dev-secret-key-change-in-production'
     
     # Database configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///backoffice.db'
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or f'sqlite:///{os.path.join(basedir, "instance", "backoffice.db")}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Google Sheets API credentials path
@@ -30,10 +31,11 @@ class Config:
     # In production, set SESSION_COOKIE_SECURE=True when using HTTPS
     SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'False').lower() == 'true'
     SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to cookies (XSS protection)
-    SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+    SESSION_COOKIE_SAMESITE = None  # Disabled for local development (different ports)
+    SESSION_COOKIE_DOMAIN = None  # Allow cookies to work across different ports in local dev
     
     # CORS configuration - restrict to specific frontend domain in production
-    FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://backoffice-1-28ne.onrender.com')
+    FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
     
     # Rate limiting configuration
     RATELIMIT_STORAGE_URL = os.environ.get('RATELIMIT_STORAGE_URL', 'memory://')

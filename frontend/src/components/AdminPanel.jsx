@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Users, ToggleLeft, ToggleRight, Plus, Trash2, Edit, Link as LinkIcon } from 'lucide-react'
+import { apiFetch } from '../api'
 
 export default function AdminPanel({ user }) {
   const [activeTab, setActiveTab] = useState('users')
@@ -17,7 +18,7 @@ export default function AdminPanel({ user }) {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users', { credentials: 'include' })
+      const response = await apiFetch('/api/admin/users')
       if (response.ok) setUsers(await response.json())
     } catch (error) {
       console.error('Failed to fetch users:', error)
@@ -26,7 +27,7 @@ export default function AdminPanel({ user }) {
 
   const fetchFeatures = async () => {
     try {
-      const response = await fetch('/api/admin/features', { credentials: 'include' })
+      const response = await apiFetch('/api/admin/features')
       if (response.ok) setFeatures(await response.json())
     } catch (error) {
       console.error('Failed to fetch features:', error)
@@ -35,7 +36,7 @@ export default function AdminPanel({ user }) {
 
   const fetchSections = async () => {
     try {
-      const response = await fetch('/api/admin/sections', { credentials: 'include' })
+      const response = await apiFetch('/api/admin/sections')
       if (response.ok) setSections(await response.json())
     } catch (error) {
       console.error('Failed to fetch sections:', error)
@@ -46,10 +47,9 @@ export default function AdminPanel({ user }) {
     e.preventDefault()
     setLoading(true)
     try {
-      const response = await fetch('/api/sheets/connect', {
+      const response = await apiFetch('/api/sheets/connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ sheet_url: sheetUrl, sheet_name: 'Main Data Sheet' })
       })
       if (response.ok) {
@@ -68,9 +68,8 @@ export default function AdminPanel({ user }) {
 
   const handleToggleFeature = async (featureId) => {
     try {
-      const response = await fetch(`/api/admin/features/${featureId}/toggle`, {
-        method: 'POST',
-        credentials: 'include'
+      const response = await apiFetch(`/api/admin/features/${featureId}/toggle`, {
+        method: 'POST'
       })
       if (response.ok) {
         fetchFeatures()
@@ -86,10 +85,9 @@ export default function AdminPanel({ user }) {
     const description = prompt('Enter feature description:') || ''
     
     try {
-      const response = await fetch('/api/admin/features', {
+      const response = await apiFetch('/api/admin/features', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ name, description, is_enabled: false })
       })
       if (response.ok) fetchFeatures()
@@ -101,9 +99,8 @@ export default function AdminPanel({ user }) {
   const handleDeleteFeature = async (featureId) => {
     if (!confirm('Are you sure you want to delete this feature?')) return
     try {
-      const response = await fetch(`/api/admin/features/${featureId}`, {
-        method: 'DELETE',
-        credentials: 'include'
+      const response = await apiFetch(`/api/admin/features/${featureId}`, {
+        method: 'DELETE'
       })
       if (response.ok) fetchFeatures()
     } catch (error) {
@@ -118,10 +115,9 @@ export default function AdminPanel({ user }) {
     const columns = prompt('Enter column indices (comma-separated, e.g., 0,1,2,3):', '0,1,2')
     
     try {
-      const response = await fetch('/api/admin/sections', {
+      const response = await apiFetch('/api/admin/sections', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           section_name: name,
           section_order: parseInt(order),
