@@ -33,83 +33,41 @@ EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
 class User(UserMixin, db.Model):
     """
     User model for authentication and authorization.
-    
-    Inherits from UserMixin to provide Flask-Login required properties:
-    - is_authenticated, is_active, is_anonymous, get_id()
-    
-    Attributes:
-        id: Primary key
-        username: Unique username for login (max 80 chars)
-        email: Unique email address (max 120 chars)
-        password_hash: Hashed password (never store plain text!)
-        role: User role - 'admin', 'supervisor', or 'agent'
-        is_active: Account status flag
-        created_at: Account creation timestamp
     """
     __tablename__ = 'users'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False, index=True)
-    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
-    password_hash = db.Column(db.String(255), nullable=False)  # Increased from 200 for longer hashes
-    role = db.Column(db.String(20), nullable=False, default='agent', index=True)  # admin, supervisor, agent
+
+    # 🔐 MODIFICATION : Changé en Text pour le chiffrement, nullable=True pour l'initialisation
+    # Retrait du unique=True direct car le chiffrement Fernet produit des chaînes uniques à chaque calcul
+    email = db.Column(db.Text, nullable=True, index=True)
+
+    # 🔐 AJOUT : Champ pour accueillir le téléphone de récupération chiffré
+    phone = db.Column(db.Text, nullable=True)
+
+    password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='agent', index=True)
     is_active = db.Column(db.Boolean, default=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    
-    # Relationship to data records created by this user
+
     data_records = db.relationship('DataRecord', backref='creator', lazy='dynamic')
-    
+
     def set_password(self, password):
-        """
-        Hash and set the user's password.
-        
-        Uses Werkzeug's pbkdf2:sha256 algorithm with salt for secure password storage.
-        Never store plain text passwords in the database!
-        
-        Args:
-            password: Plain text password to hash
-        """
         if not password or len(password) < 8:
             raise ValueError('Password must be at least 8 characters long')
         self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
-    
+
     def check_password(self, password):
-        """
-        Verify a password against the stored hash.
-        
-        Args:
-            password: Plain text password to verify
-            
-        Returns:
-            bool: True if password matches, False otherwise
-        """
         return check_password_hash(self.password_hash, password)
-    
+
     @staticmethod
     def validate_email(email):
-        """
-        Validate email format using regex.
-        
-        Args:
-            email: Email address to validate
-            
-        Returns:
-            bool: True if valid, False otherwise
-        """
         return bool(EMAIL_REGEX.match(email))
-    
+
     def has_role(self, *roles):
-        """
-        Check if user has any of the specified roles.
-        
-        Args:
-            *roles: Variable number of role names to check
-            
-        Returns:
-            bool: True if user's role is in the provided list
-        """
         return self.role in roles
-    
+
     def __repr__(self):
         return f'<User {self.username}>'
 

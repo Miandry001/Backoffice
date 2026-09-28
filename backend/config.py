@@ -47,3 +47,15 @@ class Config:
     REQUIRE_PASSWORD_LOWERCASE = True
     REQUIRE_PASSWORD_DIGIT = True
     REQUIRE_PASSWORD_SPECIAL = True
+
+    # ... Vos configurations existantes (DATABASE_URL, etc.) ...
+
+    # Clé secrète pour le chiffrement symétrique (À ajouter aussi dans l'onglet Environment sur Render)
+    # DOIT être une chaîne de 32 octets encodée en base64
+    ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY', 'MettreUneCleFernetDeSecoursIci=')
+
+    # Configuration SMTP Gmail (À configurer sur Render)
+    SMTP_SERVER = "://gmail.com"
+    SMTP_PORT = 587
+    SMTP_USERNAME = os.environ.get('SMTP_USERNAME')  # Votre adresse Gmail
+    SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD')  # Votre "Mot de passe d'application" Gmail
