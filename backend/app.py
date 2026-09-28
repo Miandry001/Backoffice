@@ -45,6 +45,43 @@ CORS(app, resources={
     }
 })
 
+# 🚀 AUTOMIGRATION POSTGRESQL (CONTOURNEMENT PLAN GRATUIT RENDER)
+@app.before_first_request
+def run_database_migration():
+    """
+    S'exécute automatiquement lors de la toute première requête reçue par Flask.
+    Met à jour la table 'users' sans perte de données.
+    """
+    import psycopg2
+    import os
+    db_url = os.environ.get('DATABASE_URL')
+    if db_url:
+        try:
+            # Connexion directe à la base en interne sur Render
+            conn = psycopg2.connect(db_url)
+            cursor = conn.cursor()
+            
+            # 1. Modification du type de la colonne email en TEXT
+            cursor.execute("ALTER TABLE users ALTER COLUMN email TYPE TEXT;")
+            cursor.execute("ALTER TABLE users ALTER COLUMN email DROP NOT NULL;")
+            
+            # 2. Suppression des anciennes contraintes uniques restrictives sur l'e-mail
+            try:
+                cursor.execute("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_email_key;")
+                cursor.execute("DROP INDEX IF EXISTS index_users_on_email;")
+            except Exception:
+                conn.rollback() # Annule l'erreur d'index si elle n'existe pas
+                
+            # 3. Ajout de la colonne phone si elle n'existe pas
+            cursor.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS phone TEXT;")
+            
+            conn.commit()
+            cursor.close()
+            conn.close()
+            app.logger.info("✅ Migration PostgreSQL exécutée automatiquement avec succès !")
+        except Exception as e:
+            app.logger.error(f"❌ Erreur lors de l'automigration SQL : {e}")
+
 # Initialize database with the app
 db.init_app(app)
 
