@@ -38,10 +38,10 @@ app.config.from_object(Config)
 # This prevents unauthorized domains from accessing the API
 CORS(app, resources={
     r"/api/*": {
-        "origins": [Config.FRONTEND_URL],
+        "origins": ["https://backoffice-frontend1.onrender.com"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
-        "supports_credentials": True  # Required for session cookies
+        "supports_credentials": True
     }
 })
 
